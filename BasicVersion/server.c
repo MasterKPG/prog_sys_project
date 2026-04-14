@@ -136,11 +136,6 @@ status_t parking_state_add(parking_state_t *pParking_state, request_t client_req
     // add a car to the struct and check if it's there or not and send back the status of the car
     if (client_req.action == ENTER){ // Requesting entry to the parking
         
-        // Check if the parking is full
-        if (pParking_state->num_cars == pParking_state->capacity){
-            return FULL;
-        }
-        
         // Check if the car is already parked
         for (int i = 0; i < pParking_state->num_cars; i++){
             // Go through the array and check if the car is already parked
@@ -148,6 +143,12 @@ status_t parking_state_add(parking_state_t *pParking_state, request_t client_req
                 return ALREADY_PARKED;
             }
         }
+        
+        // Check if the parking is full
+        if (pParking_state->num_cars == pParking_state->capacity){
+            return FULL;
+        }
+        
 
         // Parking not full, car not parked => add the car to the parking and send back SUCCESS
         pParking_state->car_ids[pParking_state->num_cars] = client_req.car_id; // Add the car ID to the array of cars present in the parking
