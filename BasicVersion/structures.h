@@ -8,6 +8,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/wait.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <semaphore.h>
 #include <fcntl.h>
 #include <time.h>
