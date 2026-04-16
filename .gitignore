@@ -1,0 +1,20 @@
+# executables
+server
+client
+inspector
+
+# Object files
+*.o
+
+# Log files
+*.log
+
+# Pipe files
+/tmp/parking_*
+
+# Editor/IDE files
+.vscode/
+*.swp
+
+# Keep the provided precompiled logger
+!logger.o

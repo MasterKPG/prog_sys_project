@@ -8,6 +8,7 @@ int tub_nomme_request; // Used to store the request fifo file descriptor
 int tub_nomme_answer; // Used to store the answer fifo file descriptor
 int shm_fd; // Used for the shared memory file descriptor 
 char PIPE_ANSWER[256]; // used to store the answer pipe fifo file name
+sem_t *semlock;
 
 /* Prototypes */
 status_t parking_state_add(parking_state_t *, request_t );
@@ -71,12 +72,30 @@ int main(int argc, char * argv[]){
     tub_nomme_request = open(PIPE_REQUESTS, O_RDONLY);
     if (tub_nomme_request == -1){
         printf("Error : Unable to open request pipe file, server shutting down...\n");
+        close(tub_nomme_request);
+        unlink(PIPE_REQUESTS);
+        shm_unlink(SHM_PARKING_STATE);
         exit(EXIT_FAILURE);
     }
 
     /* Initialising the parking state */
     pParking_state->capacity = atoi(argv[1]);
     pParking_state->num_cars = 0;
+
+    /* Creating and opening the semaphore */
+    semlock = sem_open(SEM_SHM_PARKING_STATE, O_CREAT, 0644, 1);
+    if (semlock == SEM_FAILED){ // Can't open semaphore, clean up and exit
+        printf("Error : can't open semaphore : \n");
+        perror("sem_open");
+        printf("\nServer shutting down...\n");
+        
+        // Clean up
+        close(tub_nomme_request);
+        unlink(PIPE_REQUESTS);
+        shm_unlink(SHM_PARKING_STATE);
+
+        exit(EXIT_FAILURE);
+    }
 
     /* Print server started successfully and waiting on the first request */
     printf("Sever started successfully and waiting on the first request !\n");
@@ -105,15 +124,22 @@ int main(int argc, char * argv[]){
             /* Clean up*/
             close(tub_nomme_answer);
             close(tub_nomme_request);
-
             unlink(PIPE_REQUESTS);
             shm_unlink(SHM_PARKING_STATE);
+            sem_close(semlock);
+            sem_unlink(SEM_SHM_PARKING_STATE);
         
             exit(EXIT_FAILURE);
         }
 
+        /* Ask for the token before calling parking_state_add */
+        sem_wait(semlock);
+
         client_res.car_id = client_req.car_id;
         client_res.status = parking_state_add(pParking_state, client_req);
+
+        /* Release token when done with modifying Parking_state struct */
+        sem_post(semlock);
 
         /* Print the response in human readable format */
         printf("Done working on the request, sending response :\n");
@@ -133,6 +159,8 @@ int main(int argc, char * argv[]){
     close(tub_nomme_request);
     unlink(PIPE_REQUESTS);
     shm_unlink(SHM_PARKING_STATE);
+    sem_close(semlock);
+    sem_unlink(SEM_SHM_PARKING_STATE);
     
     exit(EXIT_SUCCESS);
 }
@@ -205,5 +233,8 @@ void sig_handler(int sig){
         close(tub_nomme_request);
         unlink(PIPE_REQUESTS);
         shm_unlink(SHM_PARKING_STATE);
+        sem_close(semlock);
+        sem_unlink(SEM_SHM_PARKING_STATE);
+        exit(EXIT_SUCCESS);
     }
 }

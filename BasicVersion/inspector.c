@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+/* Global variables */
+sem_t *semlock;
+
 /**
  * @brief Displays the current state of the parking lot.
  *
@@ -71,9 +74,27 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+    /* Opening the semaphore */
+    semlock = sem_open(SEM_SHM_PARKING_STATE, 00);
+    if (semlock == SEM_FAILED){
+        printf("Error : can't open semaphore : \n");
+        perror("sem_open");
+        printf("\nInspector shutting down...\n");
+
+        // Clean up
+        close(shm_fd);
+
+        exit(EXIT_FAILURE);
+    }
+
+    /* Ask for token before calling display_parking_state */
+    sem_wait(semlock);
+
     // IfDisplay might show inconsistent state if server is running
     display_parking_state(parking_lot);
 
+    /* Release token when done with accessing the shm through display_parking_state */
+    sem_post(semlock);
 
     // Cleanup
     close(shm_fd);
