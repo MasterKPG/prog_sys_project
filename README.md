@@ -121,7 +121,7 @@ Examples:
 - [x] **Task 1** — Data structures (`request_t`, `response_t`, `parking_state_t`)
 - [x] **Task 2** — Basic client/server implementation with named pipes and shared memory
 - [x] **Task 3** — SIGINT signal handler for graceful server shutdown
-- [ ] **Task 4** — Semaphore-based synchronization for shared memory access
+- [x] **Task 4** — Semaphore-based synchronization for shared memory access
 - [ ] **Task 5** — Log monitoring using the provided logger module
 - [ ] **Task 6** — Secure log file access with `mylogger` wrapper module
 
