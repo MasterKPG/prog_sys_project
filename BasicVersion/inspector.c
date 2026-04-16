@@ -98,6 +98,7 @@ int main() {
 
     // Cleanup
     close(shm_fd);
+    sem_close(semlock);
 
     return EXIT_SUCCESS;
 }
