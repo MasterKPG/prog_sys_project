@@ -12,7 +12,8 @@ LDFLAGS = -lrt -pthread
 PRECOMPILED_OBJS = logger.o
 
 # Common source files to be compiled.
-COMMON_SRCS = mylogger.c structures.c
+# Removed mylogger.c which will be readded in task 6
+COMMON_SRCS = structures.c
 COMMON_OBJS = $(COMMON_SRCS:.c=.o)
 
 # Server-specific files.
@@ -46,15 +47,16 @@ all: $(TARGETS)
 # --- Linking Rules ---
 # These rules link the object files to create the final executables.
 # Note the addition of $(PRECOMPILED_OBJS) to the linking command.
+# Removed $(PRECOMPILED_OBJS) from the linking rules since not using the logger yet
 
 $(TARGET_SERVER): $(OBJS_SERVER) $(COMMON_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(PRECOMPILED_OBJS) $(LDFLAGS) 
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(TARGET_CLIENT): $(OBJS_CLIENT) $(COMMON_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(PRECOMPILED_OBJS) $(LDFLAGS) 
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(TARGET_INSPECTOR): $(OBJS_INSPECTOR) $(COMMON_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(PRECOMPILED_OBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 
 # --- Compilation Rule ---

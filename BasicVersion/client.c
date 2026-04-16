@@ -1,14 +1,18 @@
 
 #include "structures.h"
 
-// Prototypes
+/* GLOBAL VARIABLES */
+int returnValue_answer; // Used to store the return value of the answer fifo creation
+int tub_nomme_answer; // used to store the answer fifo file descriptor
+int tub_nomme_request; // used to store the request fifo file descriptor 
+char PIPE_ANSWER[256]; // used to store the answer pipe fifo file name
+
+/* Prototypes */
 void client_req_set(request_t *, pid_t, int, char[]);
 
+
 int main(int argc, char * argv[]){
-    int returnValue_answer; // Used to store the return value of the answer fifo creation
-    int tub_nomme_answer; // used to store the answer fifo file descriptor
-    int tub_nomme_request; // used to store the request fifo file descriptor 
-    char PIPE_ANSWER[256]; // used to store the answer pipe fifo file name
+
     request_t client_req;
     response_t client_res;
 

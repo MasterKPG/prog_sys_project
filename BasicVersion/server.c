@@ -2,19 +2,26 @@
 
 #include "structures.h"
 
+/* GLOBAL VARIABLES */
+int returnValue_request; // Used to store the return value of the request fifo creation
+int tub_nomme_request; // Used to store the request fifo file descriptor
+int tub_nomme_answer; // Used to store the answer fifo file descriptor
+int shm_fd; // Used for the shared memory file descriptor 
+char PIPE_ANSWER[256]; // used to store the answer pipe fifo file name
+
 /* Prototypes */
 status_t parking_state_add(parking_state_t *, request_t );
 void remove_at(parking_state_t *, int);
+void sig_handler(int);
+
 
 int main(int argc, char * argv[]){
-    int returnValue_request; // Used to store the return value of the request fifo creation
-    int tub_nomme_request; // Used to store the request fifo file descriptor
-    int tub_nomme_answer; // Used to store the answer fifo file descriptor
-    int shm_fd; // Used for the shared memory file descriptor 
-    char PIPE_ANSWER[256]; // used to store the answer pipe fifo file name
     request_t client_req;
     response_t client_res;
     parking_state_t *pParking_state;
+
+    /* Activate custom signal handler for SIGNINT */
+    signal(SIGINT, sig_handler);
 
     /* Check if the argument count matches the wanted one */
     if (argc < 2){
@@ -186,4 +193,17 @@ void remove_at(parking_state_t *pParking_state, int index) { // Remove element a
     }
 
     pParking_state->num_cars--; // Decrement size
+}
+
+void sig_handler(int sig){
+    if (sig == SIGINT){ // If the signal received is SIGINT
+        printf("\nSIGINT received, shutting down server...\n");
+        if (tub_nomme_answer > 0){ // Check if there is an answer pipe open, if yes then the file descriptor is 0 and we need to close it
+            close(tub_nomme_answer);
+            unlink(PIPE_ANSWER);
+        }
+        close(tub_nomme_request);
+        unlink(PIPE_REQUESTS);
+        shm_unlink(SHM_PARKING_STATE);
+    }
 }
