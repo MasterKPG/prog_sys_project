@@ -47,16 +47,15 @@ all: $(TARGETS)
 # --- Linking Rules ---
 # These rules link the object files to create the final executables.
 # Note the addition of $(PRECOMPILED_OBJS) to the linking command.
-# Removed $(PRECOMPILED_OBJS) from the linking rules since not using the logger yet
 
 $(TARGET_SERVER): $(OBJS_SERVER) $(COMMON_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(PRECOMPILED_OBJS) $(LDFLAGS) 
 
 $(TARGET_CLIENT): $(OBJS_CLIENT) $(COMMON_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(PRECOMPILED_OBJS) $(LDFLAGS) 
 
 $(TARGET_INSPECTOR): $(OBJS_INSPECTOR) $(COMMON_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(PRECOMPILED_OBJS) $(LDFLAGS)
 
 
 # --- Compilation Rule ---

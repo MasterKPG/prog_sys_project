@@ -15,6 +15,7 @@
 #include <time.h>
 #include <signal.h>
 #include <stdbool.h>
+#include "logger.h"
 
 // --- System-wide Constants ---
 #define SHM_PARKING_STATE "/parking_lot_shm"
